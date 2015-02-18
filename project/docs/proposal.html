@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Spring 2015 EE382V PDA Project Proposal</title>
+    <!-- <link rel="stylesheet" href="css/normalize.css"> -->
+    <link rel="stylesheet" href="/Users/bhaduri/Development/markdown_setup/normalize.min.css" />
+    <link rel="stylesheet" href="/Users/bhaduri/Development/markdown_setup/custom.css" />
+  </head>
+  <body>
+    <script type=x-markdown class=markdown-source># Spring 2015 EE382V PDA Project Proposal
+
+## Team
+* Chandler Brown
+* Abhi Bhaduri
+
+## Topic
+ICCAD 2014 contest on Incremental Timing-driven Placement
+
+</script>
+    <div class=markdown></div>
+    <script src="/Users/bhaduri/Development/node_modules/marked/lib/marked.js"></script>
+    <script
+    src="/Users/bhaduri/Development/bower_components/MathJax/MathJax.js?config=TeX-AMS-MML_SVG-full"></script>
+    <script>
+      var md = document.querySelector('.markdown');
+      var mdText = document.createElement('div');
+      mdText.innerHTML = document.querySelector('.markdown-source').innerHTML;
+      MathJax.Hub.Register.MessageHook('End Process', function (message) {
+        if (message[1] === mdText) {
+          md.innerHTML = marked(mdText.innerHTML, {sanitize: false});
+        }
+      });
+      MathJax.Hub.Queue(["Typeset", MathJax.Hub, mdText]);
+    </script>
+  </body>
+</html>
