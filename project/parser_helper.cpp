@@ -20,6 +20,101 @@ inline bool operator<(const row &a, const row &b)
 	return (a.origY < b.origY) || (a.origY == b.origY && a.origX < b.origX);
 }
 
+/* ************************************************************************* */
+/*  Desc: update pin locations based on owner cell locations & pin offsets   */
+/* ************************************************************************* */
+void circuit::update_pinlocs()
+{
+	for(vector<pin>::iterator thePin = pins.begin() ; thePin != pins.end() ; ++thePin)
+	{
+		if(thePin->isFixed || thePin->owner == numeric_limits<unsigned>::max())
+		{
+			thePin->x_coord = thePin->x_coord + thePin->x_offset;
+			thePin->y_coord = thePin->y_coord + thePin->y_offset;
+		}
+		else
+		{
+			thePin->x_coord = cells[ thePin->owner ].x_coord + thePin->x_offset;
+			thePin->y_coord = cells[ thePin->owner ].y_coord + thePin->y_offset;
+		}
+	}
+  return;
+}
+
+void circuit::doStuff(){
+  update_pinlocs();
+  int i=0;
+  //for(unsigned i=0; i<cells.size(); i++){
+  //if(cells[i].isFixed){
+      //cout<<"fixed"<<endl;
+      //continue;
+      //}
+    cells[i].print();
+    cout<<endl;
+  
+    net myNet;
+    cell myCell;
+    vector<double> X, Y;
+    double xopt_l, xopt_r, yopt_t, yopt_b;
+    double minX,minY,maxX,maxY;
+    for (map<string, unsigned>::iterator it=cells[i].ports.begin() ; it!=cells[i].ports.end() ; it++){
+      cout<<"port: "<<(*it).first<<" - "<<(*it).second<<endl;
+      pins[(*it).second].print();
+      myNet = nets[pins[(*it).second].net];
+      myNet.print();
+      cout<<endl;
+
+      int index=0;
+      if(myNet.source != (*it).second){
+	index=myNet.source;
+      }
+      else{
+	index=myNet.sinks[0];
+      }
+
+      if(pins[index].owner == UINT_MAX){
+	minX=maxX=pins[index].x_coord;
+	minY=maxY=pins[index].y_coord;
+      }
+      else{
+	myCell = cells[pins[index].owner];
+	minX=(double)myCell.x_coord;
+	maxX=(double)(myCell.x_coord+myCell.width);
+	minY=(double)myCell.y_coord;
+	maxY=(double)(myCell.y_coord+myCell.height);
+      }
+      
+      for(vector<unsigned>::iterator thePin=myNet.sinks.begin() ; thePin != myNet.sinks.end() ; ++thePin){
+	if(*thePin == (*it).second)
+	  continue;
+	
+	if(pins[*thePin].owner == UINT_MAX){
+	  maxX=max(maxX,pins[*thePin].x_coord);
+	  minX=min(minX,pins[*thePin].x_coord);
+	  maxY=max(maxY,pins[*thePin].y_coord);
+	  minY=min(minY,pins[*thePin].y_coord);
+	}
+	else{
+	  myCell = cells[pins[*thePin].owner];
+	  maxX=max(maxX, (double)(myCell.x_coord+myCell.width));
+	  minX=min(minX, (double)myCell.x_coord);
+	  maxY=max(maxY, (double)(myCell.y_coord+myCell.height));
+	  minY=min(minY, (double)myCell.y_coord);
+	}
+      }
+      X.push_back(minX);
+      X.push_back(maxX);
+      Y.push_back(minY);
+      Y.push_back(maxY);
+      //cout<<"max: "<<X<<" min: "<<netMinX<<endl;
+    }
+    for(int j=0; j<X.size(); j++){
+      cout<<X[j]<<" "<<Y[j]<<" "<<endl;
+    }
+    //}
+  return;
+}
+
 void circuit::read_parameters(const char* input)
 {
   cout << endl << "Reading parameter file .." <<endl;

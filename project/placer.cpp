@@ -17,7 +17,7 @@ int main(int argc, char** argv)
   if(argc != 2)
   {
     cout << "Incorrect arguments. exiting .."<<endl;
-    cout << "Usage : iccad2014_evaluation [.iccad2014]" << endl ;
+    cout << "Usage : placer [.iccad2014]" << endl ;
     return 0;
   }
 	cout << "Command line : " << endl;
@@ -27,8 +27,19 @@ int main(int argc, char** argv)
 
   circuit ckt;
   ckt.read_iccad2014_file(argv[1]);
+  ckt.copy_init_to_final();
+  //ckt.update_pinlocs();
 
+  ckt.doStuff();
+  cout<<endl<<endl<<endl;
   ckt.print();
+  
+
+  
+  string thePlacer = "placer";
+  string identifier = "";
+  ckt.write_bookshelf();
+  ckt.convert_pl_to_def(thePlacer,identifier);
 
   return 1;
 }
