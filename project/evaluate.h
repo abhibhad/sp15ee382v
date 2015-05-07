@@ -153,11 +153,12 @@ struct cell
   bool isFixed;                               /* fixed cell or not */
   map<string, unsigned> ports;                /* <port name, index to the pin> */
   string cellorient;
+  int row_num;
 
   cell () : name(""), type(numeric_limits<unsigned>::max()), 
 	          x_coord(0), y_coord(0), init_x_coord(0), init_y_coord(0), 
 						width(0.0), height(0.0),
-            isFixed(false), cellorient("") {}
+    isFixed(false), cellorient(""),row_num(0) {}
   void print();
 };
 
@@ -183,6 +184,7 @@ struct row
   int stepY;               /* (in DBU) */
   int numSites;
   string siteorient;
+  vector<int> cells;
 
   row() : name(""), site(numeric_limits<unsigned>::max()), 
 	        origX(0), origY(0), stepX(0), stepY(0), numSites(0), siteorient("") {}
@@ -254,7 +256,7 @@ class circuit
     vector<unsigned> PIs;          /* PI pin list (by id) */
     vector<unsigned> POs;          /* PO pin list (by id) */
 
-   /* locateOrCreate helper functions */
+    /* locateOrCreate helper functions */
     macro* locateOrCreateMacro(const string &macroName);
     cell*  locateOrCreateCell(const string &cellName);
     net*   locateOrCreateNet(const string &netName);
@@ -291,6 +293,7 @@ class circuit
     void read_final_def_components(ifstream &is);
     void read_def_pins(ifstream &is);
     void read_def_nets(ifstream &is);
+    void create_rows();
 
 		/* for timing evaluation */
     void update_pinlocs();
@@ -305,6 +308,9 @@ class circuit
 							 DEFVersion(""), DEFDelimiter("/"), DEFBusCharacters("[]"), 
                design_name(""), DEFdist2Microns(0), total_HPWL(1e8), total_StWL(1e8), 
                ABU_penalty(100.0), displacement(0.0) {}
+
+    /* placer */
+    void doStuff();
 
     /* primary IO functions */
 		void read_parameters(const char* input);

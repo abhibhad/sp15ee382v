@@ -49,8 +49,8 @@ void circuit::doStuff(){
       //cout<<"fixed"<<endl;
       //continue;
       //}
-    cells[i].print();
-    cout<<endl;
+  //cells[i].print();
+  //cout<<endl;
   
     net myNet;
     cell myCell;
@@ -58,11 +58,11 @@ void circuit::doStuff(){
     double xopt_l, xopt_r, yopt_t, yopt_b;
     double minX,minY,maxX,maxY;
     for (map<string, unsigned>::iterator it=cells[i].ports.begin() ; it!=cells[i].ports.end() ; it++){
-      cout<<"port: "<<(*it).first<<" - "<<(*it).second<<endl;
-      pins[(*it).second].print();
+      //cout<<"port: "<<(*it).first<<" - "<<(*it).second<<endl;
+      //pins[(*it).second].print();
       myNet = nets[pins[(*it).second].net];
-      myNet.print();
-      cout<<endl;
+      //myNet.print();
+      //cout<<endl;
 
       int index=0;
       if(myNet.source != (*it).second){
@@ -108,9 +108,9 @@ void circuit::doStuff(){
       Y.push_back(maxY);
       //cout<<"max: "<<X<<" min: "<<netMinX<<endl;
     }
-    for(int j=0; j<X.size(); j++){
+    /*for(int j=0; j<X.size(); j++){
       cout<<X[j]<<" "<<Y[j]<<" "<<endl;
-    }
+      }*/
     //}
   return;
 }
@@ -218,8 +218,21 @@ void circuit::read_iccad2014_file(const char* input)
 	calc_design_area_stats();
 
 	assert(PIs.size() < MAX_PIS && POs.size() < MAX_POS);
-
+	
+	create_rows();
 	return;
+}
+
+void circuit::create_rows(){
+  int count = 0;
+  for(vector<cell>::iterator theCell=cells.begin(); theCell !=cells.end(); ++theCell){
+    theCell->row_num = theCell->init_y_coord/rowHeight;
+    rows[theCell->row_num].cells.push_back(count);
+    count++;
+  }  
+  /*for(vector<row>::iterator theRow=rows.begin(); theRow !=rows.end(); ++theRow){
+    theRow->print();
+    }*/
 }
 
 void circuit::calc_design_area_stats()
@@ -1808,6 +1821,7 @@ void cell::print()
   cout << "(init_x,  init_y):  " << init_x_coord << ", " << init_y_coord << endl;
   cout << "(x_coord,y_coord):  " << x_coord << ", " << y_coord << endl;
   cout << "[width,height]:      " << width << ", " << height << endl;
+  cout << "row_num:            " << row_num << endl;
   cout << "|===  END  CELL ===|" << endl;
 }
 
@@ -1830,6 +1844,8 @@ void row::print()
   cout << "(stepX,stepY):     " << stepX << ", " << stepY << endl;
   cout << "numSites:          " << numSites << endl;
   cout << "orientation:       " << siteorient << endl;
+  for (unsigned i=0; i<cells.size(); ++i)
+    cout << "cell [" << i << "]:       " << cells[i] << endl;
   cout << "|===  END  ROW ===|" << endl;
 }
 
